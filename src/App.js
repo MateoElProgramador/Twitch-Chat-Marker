@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
 import './stylesheets/App.css';
 import './stylesheets/app.sass';
-import './js/twitch';
+// import './js/twitch';
 
 function App() {
   return (
@@ -16,24 +16,64 @@ function ChatBox() {
   // Create state for functional component, storing chat data and index of chat marker:
   const [messages, setMessages] = useState([{chatterName: "streamlurkr", colour: "000000", content: "!lurk"}]);
   const [markerInd, setMarkerInd] = useState(0);
+  const [isRealChat, setIsRealChat] = useState(true);
 
-  // Set up interval for new message to be added to state every 3 seconds:
+
+  
   useEffect(() => {
-    const updateChat = setInterval(newFakeMessage, 3000);
+    // Set up Twitch chat listener:
+    if (isRealChat) {
+      let client = setUpChat();
+      return () => client.disconnect();
+    // Set up interval for new fake message to be added to state every 3 seconds:
+    } else {
+      const updateChat = setInterval(newFakeMessage, 3000);
+      return () => clearInterval(updateChat);
+    }
 
-    return () => clearInterval(updateChat);
   });
+
+
+
+  const setUpChat = () => {
+    // Set up twitch chat:
+    const tmi = require('tmi.js');
+
+    const client = new tmi.Client({
+      channels: [ 'zoeyproasheck' ]
+    });
+
+    client.connect();
+
+    // Callback upon a new chat message:
+    client.on("message", (channel, tags, message, self) => {
+      console.log(`${tags["display-name"]}: ${message}`);
+      
+      // Create new message object and add to messages state list:
+      const newRealMessage = {chatterName: tags["display-name"], colour: getRandColour(), content: message};
+      setMessages([...messages, newRealMessage]);
+    });
+
+    return client;
+  }
 
 
   // Create new fake message with random name colour, and add to messages state list:
   const newFakeMessage = () => {
-    // Get random colour from list of hex codes:
-    const colours = ["0000FF", "FF0000", "8A2BE2", "FF69B4", "1E90FF", "008000", "00FF7F", "B22222", "DAA520", "FF4500", "2E8B57", "5F9EA0", "D2691E"];
-    let randColour = colours[Math.floor(Math.random() * colours.length)];
+    if (isRealChat) return;   // If real chat selected, do nothing
+
+    const randColour = getRandColour();
     
     // Create new message object and append to messages state list:
     const newMessage = {chatterName: "NewBoi_" + Math.floor(Math.random() * 1000), colour: randColour, content: "I'm new!"};
     setMessages([...messages, newMessage]);
+  }
+
+  // Return random colour from list of hex codes:
+  const getRandColour = () => {  
+    const colours = ["0000FF", "FF0000", "8A2BE2", "FF69B4", "1E90FF", "008000", "00FF7F", "B22222", "DAA520", "FF4500", "2E8B57", "5F9EA0", "D2691E"];
+    const randColour = colours[Math.floor(Math.random() * colours.length)];
+    return randColour;
   }
 
   // Callback for catchup button, moves marker position to bottom of chat list:
@@ -55,6 +95,11 @@ function ChatBox() {
     if (markerInd !== messages.length-1)
       setMarkerInd(markerInd+1);
   };
+
+  // Callback for real chat checkbox:
+  const toggleRealChat = (event) => {
+    setIsRealChat(!isRealChat);
+  }
 
 
   let message_comps = [];   // message components
@@ -87,6 +132,12 @@ function ChatBox() {
       <button id="catchup-button" onClick={catchup}>Catch up</button>
       <button id="marker-up" onClick={markerUp}>Up</button>
       <button id="marker-down" onClick={markerDown}>Down</button>
+      <div>
+        <label id="real-chat-label">
+          <input name="realChatCheckbox" type="checkbox" checked={isRealChat} onChange={toggleRealChat}/>
+          Real chat
+        </label>
+      </div>
     </div>
   );
 }
