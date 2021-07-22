@@ -59,8 +59,8 @@ function ChatBox() {
 
       <button id="catchup-button" onClick={() => {
             setMarkerInd(messages.length-1);
-            $("#chat-end")[0].scrollIntoView();
-            // $(".chat-marker")[0].scrollIntoView();
+            $("#chat-end")[0].scrollIntoView(false);
+            // $(".chat-marker")[0].scrollIntoView(false);
             }}>
         Catch up</button>
       {/* Move marker up, with boundary check to avoid overshoot */}
