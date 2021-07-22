@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
 import './stylesheets/App.css';
 import './stylesheets/app.sass';
+import './js/twitch';
 
 function App() {
   return (
