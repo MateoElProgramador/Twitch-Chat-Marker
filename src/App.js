@@ -19,24 +19,38 @@ function ChatBox() {
   const [isRealChat, setIsRealChat] = useState(true);
 
 
+  /* Old useEffect; disconnected and reconnected to chat after every new message
+     Fast chat/ instant bot replies lead to missed messages due to time required to reconnect. */
+  // useEffect(() => {
+  //   // Set up Twitch chat listener:
+  //   if (isRealChat) {
+  //     let client = setUpChat();
+  //     return () => client.disconnect();
+  //   // Set up interval for new fake message to be added to state every 3 seconds:
+  //   } else {
+  //     const updateChat = setInterval(newFakeMessage, 3000);
+  //     return () => clearInterval(updateChat);
+  //   }
+  // }, [messages]);  // only calls this if messages changes - prevents spamming marker buttons breaking everything!
   
+
+  // Initial setup on component mount:
   useEffect(() => {
     // Set up Twitch chat listener:
     if (isRealChat) {
       let client = setUpChat();
-      return () => client.disconnect();
+      return () => {alert("It had to come to this."); client.disconnect();}
     // Set up interval for new fake message to be added to state every 3 seconds:
     } else {
       const updateChat = setInterval(newFakeMessage, 3000);
       return () => clearInterval(updateChat);
     }
 
-  }, [messages]);  // only calls this if messages changes - prevents spamming marker buttons breaking everything!
+  }, []);  // only called once on component mount
 
   useEffect(() => {
     console.log("Marker updated!")
   }, [markerInd]);
-
 
 
   const setUpChat = () => {
@@ -52,10 +66,10 @@ function ChatBox() {
     // Callback upon a new chat message:
     client.on("message", (channel, tags, message, self) => {
       console.log(`${tags["display-name"]}: ${message}`);
-      
       // Create new message object and add to messages state list:
       const newRealMessage = {chatterName: tags["display-name"], colour: getRandColour(), content: message};
-      setMessages([...messages, newRealMessage]);
+      // setMessages([...messages, newRealMessage]);    // non-functional setMessages
+      setMessages(prevMessages => [...prevMessages, newRealMessage]);   // functional setMessages - doesn't use potentially stale value
     });
 
     return client;
