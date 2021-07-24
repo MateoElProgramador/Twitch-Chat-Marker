@@ -31,7 +31,7 @@ function ChatBox() {
       return () => clearInterval(updateChat);
     }
 
-  });
+  }, [messages]);  // only calls this if messages changes - prevents spamming marker buttons breaking everything!
 
 
 
@@ -40,7 +40,7 @@ function ChatBox() {
     const tmi = require('tmi.js');
 
     const client = new tmi.Client({
-      channels: [ 'zoeyproasheck' ]
+      channels: [ 'vgbootcamp' ]
     });
 
     client.connect();
@@ -79,7 +79,7 @@ function ChatBox() {
   // Callback for catchup button, moves marker position to bottom of chat list:
   const catchup = () => {
     setMarkerInd(messages.length-1);
-    $("#chat-end")[0].scrollIntoView(false);
+    $("#chat-end")[0].scrollIntoView(true);
     // $(".chat-marker")[0].scrollIntoView(false);
   };
 
