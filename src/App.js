@@ -33,6 +33,10 @@ function ChatBox() {
 
   }, [messages]);  // only calls this if messages changes - prevents spamming marker buttons breaking everything!
 
+  useEffect(() => {
+    console.log("Marker updated!")
+  }, [markerInd]);
+
 
 
   const setUpChat = () => {
@@ -75,6 +79,11 @@ function ChatBox() {
     const randColour = colours[Math.floor(Math.random() * colours.length)];
     return randColour;
   }
+
+
+  const jumpToMarker = () => {
+    $(".chat-marker")[0].scrollIntoView(true);
+  };
 
   // Callback for catchup button, moves marker position to bottom of chat list:
   const catchup = () => {
@@ -129,6 +138,7 @@ function ChatBox() {
         {message_comps}
       </div>
       
+      <button id="jumpto-marker" onClick={jumpToMarker}>Jump to marker</button>
       <button id="catchup-button" onClick={catchup}>Catch up</button>
       <button id="marker-up" onClick={markerUp}>Up</button>
       <button id="marker-down" onClick={markerDown}>Down</button>
