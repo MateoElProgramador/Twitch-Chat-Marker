@@ -46,7 +46,7 @@ function ChatBox() {
     if (isRealChat) {
       console.log("--- Connecting to " + channel + "'s chat: ---");
       let client = setUpChat();
-      return () => {console.log("Disconnecting from previos channel's chat..."); client.disconnect();}
+      return () => {console.log("Disconnecting from previous channel's chat..."); client.disconnect();}
     // Set up interval for new fake message to be added to state every 3 seconds:
     } else {
       console.log("--- Switched to fake chat: ---");
@@ -70,7 +70,7 @@ function ChatBox() {
     client.on("message", (channel, tags, message, self) => {
       console.log(`${tags["display-name"]}: ${message}`);
       // Create new message object and add to messages state list:
-      const newRealMessage = {chatterName: tags["display-name"], colour: getRandColour(), content: message};
+      const newRealMessage = {chatterName: tags["display-name"], colour: tags["color"], content: message};
       // setMessages([...messages, newRealMessage]);    // non-functional setMessages
       setMessages(prevMessages => [...prevMessages, newRealMessage]);   // functional setMessages - doesn't use potentially stale value
     });
@@ -94,7 +94,7 @@ function ChatBox() {
   const getRandColour = () => {  
     const colours = ["0000FF", "FF0000", "8A2BE2", "FF69B4", "1E90FF", "008000", "00FF7F", "B22222", "DAA520", "FF4500", "2E8B57", "5F9EA0", "D2691E"];
     const randColour = colours[Math.floor(Math.random() * colours.length)];
-    return randColour;
+    return "#" + randColour;
   }
 
 
@@ -200,7 +200,7 @@ function ChannelForm(props) {
 
 // Component for an invididual chat message:
 function ChatMessage(props) {
-  const style = {color: `#${props.colour}`};
+  const style = {color: `${props.colour}`};
   return (
         <div className="chat-message">
           <span className="chatter-name" style={style}>{props.chatterName}</span>:&nbsp;

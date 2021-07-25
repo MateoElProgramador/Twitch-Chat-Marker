@@ -10,6 +10,5 @@ This small web app was created to help smaller Twitch streamers who aim to keep 
 3. Run `npm start` to start the development server at `localhost:3000`. The web page should automatically open in your default browser.
 
 ### Future plans
-- Display correct persistent chatter colours
 - Render channel emotes, badges
 - Global keyboard shortcuts for moving marker
