@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
 import './stylesheets/App.css';
 import './stylesheets/app.sass';
-// import './js/twitch';
 
 function App() {
   return (
@@ -35,22 +34,27 @@ function ChatBox() {
   
 
   // Initial setup on component mount:
+  // useEffect(() => {
+
+  // }, []);  // only called once on component mount
+
   useEffect(() => {
     // Set up Twitch chat listener:
     if (isRealChat) {
+      console.log("--- Switched to real chat: ---");
       let client = setUpChat();
-      return () => {alert("It had to come to this."); client.disconnect();}
+      return () => {console.log("Disconnecting from chat..."); client.disconnect();}
     // Set up interval for new fake message to be added to state every 3 seconds:
     } else {
+      console.log("--- Switched to fake chat: ---");
       const updateChat = setInterval(newFakeMessage, 3000);
       return () => clearInterval(updateChat);
     }
+  }, [isRealChat]);
 
-  }, []);  // only called once on component mount
-
-  useEffect(() => {
-    console.log("Marker updated!")
-  }, [markerInd]);
+  // useEffect(() => {
+  //   console.log("Marker updated!")
+  // }, [markerInd]);
 
 
   const setUpChat = () => {
@@ -58,7 +62,7 @@ function ChatBox() {
     const tmi = require('tmi.js');
 
     const client = new tmi.Client({
-      channels: [ 'vgbootcamp' ]
+      channels: [ 'hrry' ]
     });
 
     client.connect();
@@ -84,7 +88,7 @@ function ChatBox() {
     
     // Create new message object and append to messages state list:
     const newMessage = {chatterName: "NewBoi_" + Math.floor(Math.random() * 1000), colour: randColour, content: "I'm new!"};
-    setMessages([...messages, newMessage]);
+    setMessages(prevMessages => [...prevMessages, newMessage]);
   }
 
   // Return random colour from list of hex codes:
