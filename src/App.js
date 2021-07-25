@@ -16,6 +16,7 @@ function ChatBox() {
   const [messages, setMessages] = useState([{chatterName: "streamlurkr", colour: "000000", content: "!lurk"}]);
   const [markerInd, setMarkerInd] = useState(0);
   const [isRealChat, setIsRealChat] = useState(true);
+  const [channel, setChannel] = useState("hrry");
 
 
   /* Old useEffect; disconnected and reconnected to chat after every new message
@@ -62,7 +63,7 @@ function ChatBox() {
     const tmi = require('tmi.js');
 
     const client = new tmi.Client({
-      channels: [ 'hrry' ]
+      channels: [ channel ]
     });
 
     client.connect();
@@ -128,6 +129,14 @@ function ChatBox() {
     setIsRealChat(!isRealChat);
   }
 
+  // Get inputted channel from ChannelForm state and set as this comp's channel state variable:
+  // note: strange embedded arrow functions going on to ensure event and channel variables are both passed in
+  const changeChannel = (newChannel) => (e) => {
+    console.log(e);
+    e.preventDefault();
+    setChannel(newChannel);
+  }
+
 
   let message_comps = [];   // message components
 
@@ -166,7 +175,27 @@ function ChatBox() {
           Real chat
         </label>
       </div>
+      
+      <ChannelForm changeChannel={changeChannel} />
+      
     </div>
+  );
+}
+
+// Form for entering Twitch channel name:
+function ChannelForm(props) {
+  const [channelName, setChannelName] = useState();
+
+  // Change form's channelName state variable upon change of textbox value:
+  const handleChange = (e) => {
+    setChannelName(e.target.value);
+  }
+
+  return (
+  <form onSubmit={props.changeChannel(channelName)}>
+    <input type="text" placeholder="Channel name" onChange={handleChange}/>
+    <input type="submit" value="Change" />
+  </form>
   );
 }
 
