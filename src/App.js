@@ -17,6 +17,7 @@ function ChatBox() {
   const [markerInd, setMarkerInd] = useState(0);
   const [isRealChat, setIsRealChat] = useState(true);
   const [channel, setChannel] = useState("hrry");
+  const [prevChannel, setPrevChannel] = useState("");
 
 
   /* Old useEffect; disconnected and reconnected to chat after every new message
@@ -36,31 +37,28 @@ function ChatBox() {
 
   // Initial setup on component mount:
   // useEffect(() => {
-
+    
   // }, []);  // only called once on component mount
 
+  // Set up real/fake chat if either real chat checkbox or channel change:
   useEffect(() => {
     // Set up Twitch chat listener:
     if (isRealChat) {
-      console.log("--- Switched to real chat: ---");
+      console.log("--- Connecting to " + channel + "'s chat: ---");
       let client = setUpChat();
-      return () => {console.log("Disconnecting from chat..."); client.disconnect();}
+      return () => {console.log("Disconnecting from previos channel's chat..."); client.disconnect();}
     // Set up interval for new fake message to be added to state every 3 seconds:
     } else {
       console.log("--- Switched to fake chat: ---");
       const updateChat = setInterval(newFakeMessage, 3000);
       return () => clearInterval(updateChat);
     }
-  }, [isRealChat]);
-
-  // useEffect(() => {
-  //   console.log("Marker updated!")
-  // }, [markerInd]);
+  }, [isRealChat, channel]);
 
 
   const setUpChat = () => {
     // Set up twitch chat:
-    const tmi = require('tmi.js');
+    const tmi = require("tmi.js");
 
     const client = new tmi.Client({
       channels: [ channel ]
@@ -132,8 +130,8 @@ function ChatBox() {
   // Get inputted channel from ChannelForm state and set as this comp's channel state variable:
   // note: strange embedded arrow functions going on to ensure event and channel variables are both passed in
   const changeChannel = (newChannel) => (e) => {
-    console.log(e);
     e.preventDefault();
+    setPrevChannel(channel);
     setChannel(newChannel);
   }
 
